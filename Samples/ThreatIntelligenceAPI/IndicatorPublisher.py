@@ -27,7 +27,6 @@ class IndicatorPublisher:
             'grant_type': 'client_credentials'
         }
         access_token = requests.post(
-            # two lines below should be constants: MICROSOFT_OAUTH_PRODUCTION_URL = ... MICROSOFT_OAUTH_DEV_URL = ...
             # f'https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token',  # Production code
             f'https://login.windows-ppe.net/{self.tenant}/oauth2/v2.0/token', # Temporary for dev
             data=data
