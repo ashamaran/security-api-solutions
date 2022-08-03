@@ -78,7 +78,7 @@ We'd love to get your feedback about the MISP to Microsoft Graph Security script
 
 
 UPDATE THIS.
-Your feedback is important to us. Connect with us on [Microsoft tech community](https://techcommunity.microsoft.com/t5/Using-Microsoft-Graph-Security/bd-p/SecurityGraphAPI) or [Stack Overflow](https://stackoverflow.com/questions/tagged/microsoft-graph-security). On Stack Overflow tag your questions with [microsoft-graph-security].
+Your feedback is important to us. Connect with us on [Stack Overflow](https://stackoverflow.com/questions/tagged/microsoft-graph-security). On Stack Overflow tag your questions with [threat-intelligence-api].
 
 ### Copyright
 Copyright (c) 2022 Microsoft. All rights reserved.
