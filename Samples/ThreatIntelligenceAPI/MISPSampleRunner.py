@@ -14,7 +14,7 @@ MISP_KEY = '<misp_key>'
 MISP_DOMAIN = '<misp_domain>'
 MISP_VERIFYCERT = False
 TIMERANGE = "<time_range>"
-SENTINEL_WORKSPACE_ID = "<Sentinel Workspace ID"
+SENTINEL_WORKSPACE_ID = "<Sentinel Workspace ID>"
 
 class MISPSampleRunner:
     """

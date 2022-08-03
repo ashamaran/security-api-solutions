@@ -35,7 +35,7 @@ class IndicatorConverter:
         # parses id
         indicator['id'] = event.get("uuid", "") 
         if indicator['id' ] == "":
-    
+            logger.debug_log("ERROR: MISSING REQUIRED ID VALUE. ")
         # parses created
         indicator['created'] = event.get("date", "") 
         if indicator['created' ] == "":
