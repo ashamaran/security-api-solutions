@@ -2,6 +2,8 @@ import inspect
 
 class TIAPILogging:
     """Wrapper of TI API Indicator Logger for use in handling errors as they arise."""
+
+    @staticmethod
     def _generate_log_message(msg):
         """Add details to message: class and method name of callers.
         Args:
@@ -19,6 +21,7 @@ class TIAPILogging:
         caller_method_name = stack[2][0].f_code.co_name
         return f"[{caller_class_name}].[{caller_method_name}] {msg}"
 
+    @staticmethod
     def debug_log(msg):
         """Logs debug
         Args:
@@ -26,26 +29,20 @@ class TIAPILogging:
         """
         print(TIAPILogging._generate_log_message(msg))
 
-    def warning_log(msg, properties=None):
-        """Logs warning
-        Args:
-                msg (str): the message
-                properties:- custom dimensions for the log
-        """
-        print(TIAPILogging.warning_log(_generate_log_message(msg)))
-
+    @staticmethod
     def error_log(msg, properties=None):
         """Logs error
         Args:
                 msg (str): the message
                 properties:- custom dimensions for the log
         """
-        print(_generate_log_message(msg))
+        print(TIAPILogging._generate_log_message(msg))
 
+    @staticmethod
     def exception_log(exception, properties=None):
         """Logs error
         Args:
-                msg (str): the message
+                exception (str): the exception
                 properties:- custom dimensions for the log
         """
-        print(TIAPILogging.exception_log(exception))
+        print(TIAPILogging._generate_log_message(exception))

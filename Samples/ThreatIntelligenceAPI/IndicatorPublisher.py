@@ -3,8 +3,11 @@ from pymisp import ExpandedPyMISP
 import requests
 from TIAPILogging import TIAPILogging as logger
 
-TI_INDICATORS_URL = 'https://tigateway-dev-ev2test-ezavczd2eghfbxa2.z01.azurefd.net/afdc859e-6cc3-4bcb-a9ec-cd463fb1f4c1/threatintelligence:upload-indicators'
-
+#add comments explaining what each of these constants are/what they do
+TI_INDICATORS_URL = 'https://tigateway-dev-ev2test-ezavczd2eghfbxa2.z01.azurefd.net/{sentinel_workspace_id}/threatintelligence:upload-indicators'
+#production_microsoft_oauth_url and dev_microsoft_oauth_url
+PRODUCTION_INDICATORS_URL = 'https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token'
+DEV_INDICATORS_URL = 'https://login.windows-ppe.net/{tenant}/oauth2/v2.0/token'
 class IndicatorPublisher: 
     """
     A class that handles sending indicators to the Threat Intelligence API. 
@@ -29,13 +32,13 @@ class IndicatorPublisher:
             'grant_type': 'client_credentials'
         }
         access_token = requests.post(
-             # Production code
-            # f'https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token', 
+            # Production code
+            # PRODUCTION_INDICATORS_URL.format(tenant=self.tenant), 
             # Temporary for dev
-            f'https://login.windows-ppe.net/{self.tenant}/oauth2/v2.0/token', 
+            DEV_INDICATORS_URL.format(tenant=self.tenant), 
             data=data
         ).json()['access_token']
-        logger.debug_log("access token created")   
+        logger.debug_log("Access token created")   
         return access_token
 
     def publish(self, indicators) -> bool: 
@@ -50,14 +53,14 @@ class IndicatorPublisher:
         body = {'value': indicators}
         token = self._get_access_token()
         response = requests.post(
-            'https://tigateway-dev-ev2test-ezavczd2eghfbxa2.z01.azurefd.net/' + self.sentinel_workspace_id + '/threatintelligence:upload-indicators',
+            TI_INDICATORS_URL.format(sentinel_workspace_id=self.sentinel_workspace_id),
             headers={"Authorization": f"Bearer {token}"}, 
             json=body
             )
-        logger.debug_log("request sent")
+        logger.debug_log("Request sent")
         if(response.ok):
-            logger.debug_log("request successful")
+            logger.debug_log("Request successful")
             return True
         reason = response.reason
-        logger.debug_log("request failed with error " + response.status_code + ", " + format(reason))
+        logger.error_log("Request failed with error " + str(response.status_code) + ", " + format(reason))
         return False

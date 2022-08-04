@@ -32,4 +32,3 @@ class MISPEventProvider:
         ]
         logger.debug_log("Events from timestamp until now returned. ")
         return events_by_timestamp[0]
-

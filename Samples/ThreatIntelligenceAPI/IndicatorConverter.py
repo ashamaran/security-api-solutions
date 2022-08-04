@@ -4,6 +4,9 @@ from datetime import timedelta
 import json
 from TIAPILogging import TIAPILogging as logger
 
+# add (Preview) to the title of the Codeless Connector
+# when given the enum value, add that to the query for upload. 
+
 TYPE = 'indicator'
 PATTERN_TYPE = 'stix'
 
@@ -35,19 +38,23 @@ class IndicatorConverter:
         # parses id
         indicator['id'] = event.get("uuid", "") 
         if indicator['id' ] == "":
-            logger.debug_log("ERROR: MISSING REQUIRED ID VALUE. ")
+            logger.exception_log("EXCEPTION: MISSING REQUIRED ID VALUE. ")
+            raise AttributeError("The required attribute is not populated due to the field ('uuid') not being given in the event")
         # parses created
         indicator['created'] = event.get("date", "") 
         if indicator['created' ] == "":
-            logger.debug_log("ERROR: MISSING REQUIRED CREATED VALUE. ")
+            logger.exception_log("EXCEPTION: MISSING REQUIRED CREATED VALUE. ")
+            raise AttributeError("The required attribute is not populated due to the field ('date') not being given in the event")
         # parses valid_from
         indicator['valid_from'] = event.get("date", "") 
         if indicator['valid_from' ] == "":
-            logger.debug_log("ERROR: MISSING REQUIRED VALID_FROM VALUE. ")
+            logger.exception_log("EXCEPTION: MISSING REQUIRED VALID_FROM VALUE. ")
+            raise AttributeError("The required attribute is not populated due to the field ('date') not being given in the event")
         # parses modified
         modified = event.get("timestamp", "")
         if modified == "":
-            logger.debug_log("ERROR: MISSING REQUIRED MODIFIED VALUE. ")
+            logger.exception_log("EXCEPTION: MISSING REQUIRED MODIFIED VALUE. ")
+            raise AttributeError("The required attribute is not populated due to the field ('timestamp') not being given in the event")
         indicator['modified'] = str(datetime.datetime.fromtimestamp(int(modified)))
         # parses type
         indicator['type'] = TYPE

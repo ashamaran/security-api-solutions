@@ -47,6 +47,7 @@ MISP_KEY = '<misp_key>'
 MISP_DOMAIN = '<misp_domain>'
 MISP_VERIFYCERT = False
 TIMERANGE = "<time_range>"
+SENTINEL_WORKSPACE_ID = "<Sentinel Workspace ID>"
 ```
 
 Once changes are complete, save the MISPSampleRunner file. After you've completed these steps and have received [admin consent](ADD LINK HERE) for your app, you'll be able to run the script.py sample as covered below.
