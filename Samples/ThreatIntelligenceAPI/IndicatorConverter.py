@@ -7,8 +7,8 @@ from TIAPILogging import TIAPILogging as logger
 # add (Preview) to the title of the Codeless Connector
 # when given the enum value, add that to the query for upload. 
 
-TYPE = 'indicator'
-PATTERN_TYPE = 'stix'
+TYPE = "indicator"
+PATTERN_TYPE = "stix"
 
 class IndicatorConverter: 
     """A class that handles converting events to Stix Indicators for use in the Threat Intelligence Indicator API
@@ -17,80 +17,86 @@ class IndicatorConverter:
     @staticmethod
     def _generate_indicator(event) -> defaultdict:
         """Sets up required indicator values, including: "type", "spec_version", "id", "created", "modified", "pattern", "pattern_type", and "valid_from", and optional values, which are not necessary to send an indicator but can be populated if the information is given
-
         Args:
             event (dictionary): the event that will be converted into an indicator
-
         Returns:
             defaultdict: the indicator as a default dict that contains all required information, and all optional information that exists. 
         """
         indicator = defaultdict(list) 
         # parses pattern
-        for attr in event['Attribute']: 
+        for attr in event['Attribute']:  # set this under Network Activity on the MISP Server. 
             if attr['type'] == 'ip-src': 
-                indicator['pattern'] = 'ipv4-addr:value = \'' + attr['value'] + '\''
+                indicator["pattern"] = '[ipv4-addr:value = \'' + attr['value'] + '\']' 
             elif attr['type'] == 'domain': 
-                indicator['pattern'] = 'domain-name:value = \'' + attr['value'] + '\''
-            else: 
-                indicator['pattern'] = attr['type'] + ':value = \'' + attr['value'] + '\''
+                indicator["pattern"] = '[domain-name:value = \'' + attr['value'] + '\']'
+        if indicator["pattern"] == "":
+            logger.exception_log("EXCEPTION: MISSING REQUIRED PATTERN VALUE. ")
+            raise AttributeError("The required attribute is not populated due to the field (\"pattern\") not being given in the event")
          # parses spec_version
-        indicator['spec_version'] = '2.1'
+        indicator["spec_version"] = "2.1"
         # parses id
-        indicator['id'] = event.get("uuid", "") 
-        if indicator['id' ] == "":
+        id = event.get("uuid", "") 
+        if id == "":
             logger.exception_log("EXCEPTION: MISSING REQUIRED ID VALUE. ")
-            raise AttributeError("The required attribute is not populated due to the field ('uuid') not being given in the event")
+            raise AttributeError("The required attribute is not populated due to the field (\"uuid\") not being given in the event")
+        indicator["id"] = "indicator--" + id
         # parses created
-        indicator['created'] = event.get("date", "") 
-        if indicator['created' ] == "":
+        indicator["created"] = event.get("date", "") 
+        if indicator["created" ] == "":
             logger.exception_log("EXCEPTION: MISSING REQUIRED CREATED VALUE. ")
-            raise AttributeError("The required attribute is not populated due to the field ('date') not being given in the event")
+            raise AttributeError("The required attribute is not populated due to the field (\"date\") not being given in the event")
         # parses valid_from
-        indicator['valid_from'] = event.get("date", "") 
-        if indicator['valid_from' ] == "":
+        indicator["valid_from"] = event.get("date", "") 
+        if indicator["valid_from" ] == "":
             logger.exception_log("EXCEPTION: MISSING REQUIRED VALID_FROM VALUE. ")
-            raise AttributeError("The required attribute is not populated due to the field ('date') not being given in the event")
+            raise AttributeError("The required attribute is not populated due to the field (\"date\") not being given in the event")
         # parses modified
         modified = event.get("timestamp", "")
         if modified == "":
             logger.exception_log("EXCEPTION: MISSING REQUIRED MODIFIED VALUE. ")
-            raise AttributeError("The required attribute is not populated due to the field ('timestamp') not being given in the event")
-        indicator['modified'] = str(datetime.datetime.fromtimestamp(int(modified)))
+            raise AttributeError("The required attribute is not populated due to the field (\"timestamp\") not being given in the event")
+        indicator["modified"] = str(datetime.datetime.fromtimestamp(int(modified)))
         # parses type
-        indicator['type'] = TYPE
+        indicator["type"] = TYPE
         # parses pattern_type
-        indicator['pattern_type'] = PATTERN_TYPE
+        indicator["pattern_type"] = PATTERN_TYPE
         logger.debug_log("Required indicator values parsed")
-        
+
         # these are optional properties that can be added to
+        for attr in event['Attribute']:   
+            # parses name
+            if attr['type'] == 'full-name': # set this under Person on the MISP Server.
+                indicator["name"] = attr['value']
+            if attr['type'] == 'comment': # set this under Other on the MISP Server
+                indicator["confidence"] = int(attr['value'])
         # parses description
-        indicator['description'] = event.get("info", "") 
+        indicator["description"] = event.get("info", "") 
         # parses valid_until
-        indicator['valid_until'] = str(datetime.date.today() + timedelta(days=90)) 
-        indicator['tags'] = [tag['name'].strip() for tag in event.get("Tag", [])] 
-        for tag in indicator['tags']:
+        indicator["valid_until"] = str(datetime.date.today() + timedelta(days=90)) 
+        indicator["tags"] = [tag['name'].strip() for tag in event.get("Tag", [])] 
+        for tag in indicator["tags"]:
             # parses traffic light protocol
-            if 'tlp:' in tag: 
-                indicator['tlpLevel'] = tag.split(':')[1]
-            if 'tlpLevel' not in indicator:
-                indicator['tlpLevel'] = 'red'
+            if "tlp:" in tag: 
+                indicator["tlpLevel"] = tag.split(":")[1]
+            if "tlpLevel" not in indicator:
+                indicator["tlpLevel"] = "red"
                 # parses diamond model
-            if 'diamond-model:' in tag: 
-                indicator['diamondModel'] = tag.split(':')[1]
+            if "diamond-model:" in tag: 
+                indicator["diamondModel"] = tag.split(":")[1]
+        # parses created_by
+        # print(event.get('event_creator_email'))
+        # indicator["created_by_ref"] = "identity--" + event.get('event_creator_email', "") 
         logger.debug_log("Optional indicator values parsed")
         return indicator
-        
+
     @staticmethod
     def convert_event_to_indicator(event) -> dict:
         """Runs _generate_indicator(event) on an event, and converts it to .json format (dict) for returning. 
-
         Args:
             event (dict): the event itself being parsed
-
         Returns:
             dict: .json that can be used to upload an indicator to the API. 
         """
         indicator = IndicatorConverter._generate_indicator(event)
         logger.debug_log("Event converted.")
         return json.loads(json.dumps(indicator))
-

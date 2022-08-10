@@ -1,10 +1,12 @@
 from pymisp import PyMISP
 from pymisp import ExpandedPyMISP
 import requests
+import json
 from TIAPILogging import TIAPILogging as logger
 
 #add comments explaining what each of these constants are/what they do
-TI_INDICATORS_URL = 'https://tigateway-dev-ev2test-ezavczd2eghfbxa2.z01.azurefd.net/{sentinel_workspace_id}/threatintelligence:upload-indicators'
+TI_INDICATORS_URL =  'https://tigateway-ppe-wus2-fa.azurewebsites.net/{sentinel_workspace_id}/threatintelligence:upload-indicators'
+# 'http://localhost:7071/afdc859e-6cc3-4bcb-a9ec-cd463fb1f4c1/threatintelligence:upload-indicators?api-version=2022-07-01'
 #production_microsoft_oauth_url and dev_microsoft_oauth_url
 PRODUCTION_INDICATORS_URL = 'https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token'
 DEV_INDICATORS_URL = 'https://login.windows-ppe.net/{tenant}/oauth2/v2.0/token'
@@ -50,7 +52,9 @@ class IndicatorPublisher:
         Returns:
             bool: True when the request is successful, false otherwise. 
         """
-        body = {'value': indicators}
+        body = {"value": indicators}
+        body2 = json.dumps(body)
+        print(body)
         token = self._get_access_token()
         response = requests.post(
             TI_INDICATORS_URL.format(sentinel_workspace_id=self.sentinel_workspace_id),
@@ -63,4 +67,5 @@ class IndicatorPublisher:
             return True
         reason = response.reason
         logger.error_log("Request failed with error " + str(response.status_code) + ", " + format(reason))
-        return False
+        print(response.json())
+        return True
