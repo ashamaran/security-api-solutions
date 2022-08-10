@@ -5,21 +5,17 @@ from IndicatorPublisher import IndicatorPublisher
 from TIAPILogging import TIAPILogging as logger
 
 OAUTH_CONFIG = {
-    # 'tenant': '72f988bf-86f1-41af-91ab-2d7cd011db47',   ##Production
-    # 'client_id': '2785e766-9011-4e0c-871c-91d4d0b7dde8', 
-    # 'client_secret': 'pT68Q~PxGNsbYEkgZGIPqCLcCzhmqNk5EffK4aZU', 
-    # 'scope': 'https://management.azure.com/.default'
-
-    'tenant': 'f686d426-8d16-42db-81b7-ab578e110ccd', ## Dev
-    'client_id': '81616c92-ccbd-4873-9f02-1499a6eb2504', 
-    'client_secret': '9tZ8Q~kkWkaE6bSZr.7n1uZ-eNQeST8FQ3nnGbm1', 
-    'scope': 'https://management.azure.com/.default'
+    'tenant': '<tenant id>',
+    'client_id': '<client id>',
+    'client_secret': '<client secret>',
+    'scope': '<scope>'
 }
-MISP_KEY = 'bhMRSoZKdDG6CB9B1x2dx48pXVAmqggjl0Czg4sj'
-MISP_DOMAIN = 'https://20.115.210.151/'
+MISP_KEY = '<misp_key>'
+MISP_DOMAIN = '<misp_domain>'
 MISP_VERIFYCERT = False
-TIMERANGE = "7d"
-SENTINEL_WORKSPACE_ID = "afdc859e-6cc3-4bcb-a9ec-cd463fb1f4c1"
+TIMERANGE = "<time_range>"
+SENTINEL_WORKSPACE_ID = "<Sentinel Workspace ID"
+
 
 class MISPSampleRunner:
     """
@@ -36,7 +32,6 @@ class MISPSampleRunner:
         logger.debug_log("Fetching & parsing data from MISP")
         misp_provider = MISPEventProvider(MISP_DOMAIN, MISP_KEY, MISP_VERIFYCERT)
         events = misp_provider.get_events(lookBackTimeInDays=TIMERANGE)
-        # events = MISPEventProvider._pseudo_get_events() #REMOVE AT END. 
         if len(events) == 0 or (len(events) == 1 and len(events[0]) == 0):
             logger.error_log("ERROR: NO EVENTS PULLED FROM MISP")
             return
