@@ -1,3 +1,4 @@
+# importing the MISPSampleRunner class to run the project as necessary. Refer to MISPSampleRunner.py to see more details. 
 from MISPSampleRunner import MISPSampleRunner as Runner 
 
 def main():

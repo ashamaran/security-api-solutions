@@ -1,8 +1,8 @@
 # NOT FULLY UPDATED, DO NOT EDIT. 
 # MISP to Microsoft Threat Intelligence API Script
-The <b> MISP to Microsoft Threat Intelligence API Script </b> enables you to connect your custom threat indicators and make them available in the following Microsoft products: **[Azure Sentinel](https://azure.microsoft.com/en-us/services/azure-sentinel/)**, **[Microsoft Defender ATP](https://www.microsoft.com/en-us/microsoft-365/windows/microsoft-defender-atp/)**
+The <b> MISP to Microsoft Threat Intelligence API Script </b> enables you to connect your custom threat indicators and make them available in the following Microsoft products: **insert products here**
 <br/>
-The script provides clients with MISP instances to migrate threat indicators to the [Microsoft Threat Intelligence API](INSERT LINK). 
+The script provides clients with MISP instances to migrate threat indicators to the **[Microsoft Threat Intelligence API](INSERT LINK)**. 
 
 For more information on Microsoft Threat Intelligence API visit [Microsoft Threat Intelligence API](INSERT LINK). <br/>
 For more information on MISP visit https://www.misp-project.org/.
@@ -11,6 +11,7 @@ For more information on MISP visit https://www.misp-project.org/.
 Before installing the sample:
 * Install Python 3.x version from https://www.python.org/.
 * Ensure MISP Server is installed and can be connected to - refer to MISP install details at https://www.misp-project.org/download/  
+* Install PyMisp using the command ```pip install pymisp```
 
 **For more info on how to register app, see "App Registration" section.**
 
@@ -50,6 +51,8 @@ TIMERANGE = "<time_range>"
 SENTINEL_WORKSPACE_ID = "<Sentinel Workspace ID>"
 ```
 
+1. The OAUTH_CONFIG Values should be found in this App Registration Process. the MISP_KEY and MISP_DOMAIN should be found after the installation of the MISP server. The TIMERANGE Value is how many days worth of indicators you would like to see. The SENTINEL_WORKSPACE_ID is the workspace on Sentinel that the indicators should be uploaded to. 
+
 Once changes are complete, save the MISPSampleRunner file. After you've completed these steps and have received [admin consent](ADD LINK HERE) for your app, you'll be able to run the script.py sample as covered below.
 
 
@@ -57,14 +60,11 @@ Once changes are complete, save the MISPSampleRunner file. After you've complete
 The Misp Key is required to fetch data from your Misp instance. 
 It can be found in the event actions menu under automation on the website of the Misp instance.
 
-`misp_key = '<misp key>'`
-
 #### Misp Domain
 Misp Domain is the base URL of your MISP instance.
 
 #### Misp Verify Cert
 This gives you the option to choose if python should validate the certificate of the misp instance. This allows ease within testing environments.
-It is recommended to use a valid SSL cert in production and change this value to True.
 
 `misp_verifycert = False` 
 

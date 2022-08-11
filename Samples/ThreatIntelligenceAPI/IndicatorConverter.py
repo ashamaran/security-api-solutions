@@ -1,13 +1,17 @@
+# import defaultdict because the indicators are originally returned as default dicts.
 from collections import defaultdict
+# import datetime to grab timestamp values from events
 import datetime
+# import timedelta to easily add 90 days to find valid_until values
 from datetime import timedelta
+# import json to switch format from defaultdict to dict/json
 import json
+# import from TIAPILogging.py to log each section of the events
 from TIAPILogging import TIAPILogging as logger
 
-# add (Preview) to the title of the Codeless Connector
-# when given the enum value, add that to the query for upload. 
-
+# the TYPE of the event being handled is an indicator, because that is what we take from the MISP server
 TYPE = "indicator"
+# the PATTERN_TYPE of the event is STIX, since we are converting events to STIX Indicators
 PATTERN_TYPE = "stix"
 
 class IndicatorConverter: 
@@ -22,9 +26,13 @@ class IndicatorConverter:
         Returns:
             defaultdict: the indicator as a default dict that contains all required information, and all optional information that exists. 
         """
+        # the indicator will be saved/returned as a defaultdict, initialized below
         indicator = defaultdict(list) 
         # parses pattern
         for attr in event['Attribute']:  # set this under Network Activity on the MISP Server. 
+            # we parse the indicator pattern into the format of: [<type>:value = '<type-value>']
+            # this is shown in the lines below. 
+            # if the type/pattern is not given, an exception is thrown since it is a required value.
             if attr['type'] == 'ip-src': 
                 indicator["pattern"] = '[ipv4-addr:value = \'' + attr['value'] + '\']' 
             elif attr['type'] == 'domain': 
@@ -35,6 +43,7 @@ class IndicatorConverter:
          # parses spec_version
         indicator["spec_version"] = "2.1"
         # parses id
+        # event.get("key", "") takes the value from the specific key in the dictionary, and returns an empty string if it's not populated. if there is no value, we throw an exception
         id = event.get("uuid", "") 
         if id == "":
             logger.exception_log("EXCEPTION: MISSING REQUIRED ID VALUE. ")
@@ -55,6 +64,7 @@ class IndicatorConverter:
         if modified == "":
             logger.exception_log("EXCEPTION: MISSING REQUIRED MODIFIED VALUE. ")
             raise AttributeError("The required attribute is not populated due to the field (\"timestamp\") not being given in the event")
+        # the modified value is given as a string. we convert it to an integer to then grab the datetime object from it so it is easily readable by humans. it is then turned back into a string once it is a date. 
         indicator["modified"] = str(datetime.datetime.fromtimestamp(int(modified)))
         # parses type
         indicator["type"] = TYPE
@@ -72,10 +82,12 @@ class IndicatorConverter:
         # parses description
         indicator["description"] = event.get("info", "") 
         # parses valid_until
+        # typically, the indicate is valid_until 90 days after the current date. this gives that value. 
         indicator["valid_until"] = str(datetime.date.today() + timedelta(days=90)) 
         indicator["tags"] = [tag['name'].strip() for tag in event.get("Tag", [])] 
         for tag in indicator["tags"]:
             # parses traffic light protocol
+            # if the tlp value is given, we take that and save it. if it is not, we automatically give it a tlp of "red"
             if "tlp:" in tag: 
                 indicator["tlpLevel"] = tag.split(":")[1]
             if "tlpLevel" not in indicator:
@@ -84,8 +96,6 @@ class IndicatorConverter:
             if "diamond-model:" in tag: 
                 indicator["diamondModel"] = tag.split(":")[1]
         # parses created_by
-        # print(event.get('event_creator_email'))
-        # indicator["created_by_ref"] = "identity--" + event.get('event_creator_email', "") 
         logger.debug_log("Optional indicator values parsed")
         return indicator
 
@@ -99,4 +109,6 @@ class IndicatorConverter:
         """
         indicator = IndicatorConverter._generate_indicator(event)
         logger.debug_log("Event converted.")
+        # json.dumps takes in a json object and returns a string. json.loads() takes in a string and returns a .json object. 
+        # this return takes in the indicator as a default dict, switches it to a string, and switches the string to a .json/dictionary. 
         return json.loads(json.dumps(indicator))
